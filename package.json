@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "dashboard": "^0.0.1",
-    "dockerfile": "^0.1.1"
+    "dockerfile": "^0.1.1",
+    "index.php": "^1.0.0"
   }
 }
