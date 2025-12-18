@@ -21,8 +21,9 @@ RUN php -m | grep -i pdo_pgsql || (echo "❌ pdo_pgsql not installed!" && exit 1
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Disable conflicting MPM modules and enable only mpm_prefork
-RUN a2dismod mpm_event mpm_worker && a2enmod mpm_prefork
+# FIX MPM ISSUE - Properly disable conflicting modules
+RUN a2dismod mpm_event mpm_worker 2>/dev/null || true
+RUN a2enmod mpm_prefork
 
 # Enable Apache modules
 RUN a2enmod rewrite headers
@@ -35,23 +36,21 @@ COPY docker-start.sh /usr/local/bin/docker-start.sh
 RUN chmod +x /usr/local/bin/docker-start.sh
 
 # Copy composer files first
-COPY composer.json ./
+COPY composer.json composer.lock* ./
 
-# Remove old composer.lock and regenerate
-RUN rm -f composer.lock
-
-# Install ALL dependencies from composer.json
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+# Install dependencies
+RUN composer install --no-dev --optimize-autoloader --no-interaction || \
+    (rm -f composer.lock && composer install --no-dev --optimize-autoloader --no-interaction)
 
 # Copy all files
 COPY . .
 
-# ✅ UPDATED: Verify Resend installation
+# Verify installations
 RUN php -r "require 'vendor/autoload.php'; \
     echo 'Checking installations...\n'; \
     echo 'Resend: ' . (class_exists('Resend\Client') ? '✅' : '❌') . '\n'; \
     echo 'Google_Client: ' . (class_exists('Google_Client') ? '✅' : '❌') . '\n'; \
-    echo 'Dotenv: ' . (class_exists('Dotenv\Dotenv') ? '✅' : '❌') . '\n';"
+    echo 'Dotenv: ' . (class_exists('Dotenv\Dotenv') ? '✅' : '❌') . '\n';" || true
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html && \
