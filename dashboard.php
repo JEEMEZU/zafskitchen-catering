@@ -4639,12 +4639,13 @@ if ($currentTimestamp > $eventEndTimestamp) {
     }
 }
 
-/* Calendar Loading Animation */
+/* Calendar Loading Animation - ENHANCED */
 #calendar-loading {
     min-height: 400px;
     display: flex;
     align-items: center;
     justify-content: center;
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.03), rgba(185, 28, 28, 0.03));
 }
 
 @keyframes spin {
@@ -4652,23 +4653,73 @@ if ($currentTimestamp > $eventEndTimestamp) {
     100% { transform: rotate(360deg); }
 }
 
+@keyframes bounce {
+    0%, 100% { 
+        transform: translateY(0);
+        opacity: 0.3;
+    }
+    50% { 
+        transform: translateY(-10px);
+        opacity: 1;
+    }
+}
+
 .animate-spin {
     animation: spin 1s linear infinite;
 }
 
-/* Mobile responsive */
+.animate-bounce {
+    animation: bounce 1s ease-in-out infinite;
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Dark mode loading screen */
+[data-theme="dark"] #calendar-loading {
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(185, 28, 28, 0.1));
+}
+
+/* Mobile responsive - ENHANCED */
 @media (max-width: 768px) {
     #calendar-loading {
         min-height: 300px;
     }
     
-    #calendar-loading .w-20.h-20 {
-        width: 60px !important;
-        height: 60px !important;
+    /* Outer ring */
+    #calendar-loading .w-24.h-24 {
+        width: 80px !important;
+        height: 80px !important;
     }
     
+    /* Inner ring */
+    #calendar-loading .w-16.h-16 {
+        width: 56px !important;
+        height: 56px !important;
+    }
+    
+    /* Calendar icon */
     #calendar-loading i {
-        font-size: 1.5rem !important;
+        font-size: 1.25rem !important;
+    }
+    
+    /* Loading text */
+    #calendar-loading p.font-semibold {
+        font-size: 0.9rem !important;
+    }
+    
+    #calendar-loading p.text-sm {
+        font-size: 0.75rem !important;
     }
 }
 
@@ -6305,15 +6356,31 @@ if ($currentTimestamp > $eventEndTimestamp) {
                     </div>
                 </section>
 
-                <!-- Loading Screen for Calendar -->
+<!-- Loading Screen for Calendar -->
 <div id="calendar-loading" class="hidden">
     <div class="flex flex-col items-center justify-center py-12">
         <div class="relative">
-            <div class="w-20 h-20 border-4 border-gray-200 border-t-[#DC2626] rounded-full animate-spin"></div>
-            <i class="fas fa-calendar-alt absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[#DC2626] text-2xl"></i>
+            <!-- Outer rotating ring -->
+            <div class="w-24 h-24 border-4 border-gray-200 border-t-[#DC2626] rounded-full animate-spin"></div>
+            
+            <!-- Inner rotating ring (opposite direction) -->
+            <div class="absolute inset-0 flex items-center justify-center">
+                <div class="w-16 h-16 border-4 border-transparent border-b-[#B91C1C] rounded-full animate-spin" style="animation-direction: reverse; animation-duration: 1.5s;"></div>
+            </div>
+            
+            <!-- Calendar icon in center -->
+            <i class="fas fa-calendar-alt absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[#DC2626] text-2xl animate-pulse"></i>
         </div>
-        <p class="text-gray-600 mt-4 font-semibold">Loading schedule...</p>
+        
+        <p class="text-gray-600 mt-4 font-semibold animate-pulse">Loading schedule...</p>
         <p class="text-gray-500 text-sm mt-2">Please wait</p>
+        
+        <!-- Progress dots -->
+        <div class="flex gap-2 mt-3">
+            <div class="w-2 h-2 bg-[#DC2626] rounded-full animate-bounce" style="animation-delay: 0s;"></div>
+            <div class="w-2 h-2 bg-[#DC2626] rounded-full animate-bounce" style="animation-delay: 0.2s;"></div>
+            <div class="w-2 h-2 bg-[#DC2626] rounded-full animate-bounce" style="animation-delay: 0.4s;"></div>
+        </div>
     </div>
 </div>
 
@@ -8844,13 +8911,20 @@ ${booking.booking_status === 'completed' && booking.event_rating && booking.even
                     minute: '2-digit'
                 });
                 
-                    // Calculate price if package_price exists, otherwise estimate
-                    let displayPrice = ' ₱0.00';
-                    if (booking.package_price && booking.package_price > 0) {
-                        displayPrice = ` ₱${parseFloat(booking.package_price).toLocaleString('en-PH', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        })}`;
+                // Calculate price - prioritize total_price for completed/paid bookings
+                let displayPrice = '₱0.00';
+                if (booking.total_price && parseFloat(booking.total_price) > 0) {
+                    // Use total_price (includes service charges)
+                    displayPrice = `₱${parseFloat(booking.total_price).toLocaleString('en-PH', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    })}`;
+                } else if (booking.package_price && booking.package_price > 0) {
+                    // Fallback to package_price
+                    displayPrice = `₱${parseFloat(booking.package_price).toLocaleString('en-PH', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    })}`;
                     } else if (booking.guest_count && booking.food_package) {
                     // Estimate price based on package and guest count from pricing table
                     const packagePricing = PACKAGE_PRICES[booking.food_package];
@@ -10676,37 +10750,54 @@ document.addEventListener('keydown', function(e) {
                 localStorage.setItem('currentSection', sectionId);
             }
 
-        const navLinks = document.querySelectorAll("nav a");
-        navLinks.forEach(link => {
-            link.addEventListener("click", e => {
-                e.preventDefault();
-                hideAllSections();
-                navLinks.forEach(l => l.classList.remove("active-nav"));
-                link.classList.add("active-nav");
-                const text = link.innerText.trim();
-                const sectionId = navMap[text];
-                if (sectionId) {
-                    // Save to localStorage
-                    saveCurrentSection(sectionId);
-                    
-                    document.getElementById(sectionId).classList.remove("hidden");
-                    
-                    if (sectionId === 'section-book') {
-                        resetBookingForm();
-                    } else if (sectionId === 'section-schedule') {
-                        loadCalendar();
-                    } else if (sectionId === 'section-mybookings') {
-                        loadMyBookings();
-                    } else if (sectionId === 'section-settings') {
-                        // FIXED: Load stats when Profile Settings is clicked
-                        loadBookingStats();
-                        loadProfileSettings();
-                    }
-                }
-                document.getElementById("section-dashboard").classList.add("hidden");
-                if (window.innerWidth < 1024) toggleSidebar();
-            });
-        });
+const navLinks = document.querySelectorAll("nav a");
+navLinks.forEach(link => {
+    link.addEventListener("click", e => {
+        e.preventDefault();
+        
+        // ✅ ABORT any ongoing calendar loading
+        if (calendarLoadingAbort !== null) {
+            calendarLoadingAbort = true;
+        }
+        
+        hideAllSections();
+        navLinks.forEach(l => l.classList.remove("active-nav"));
+        link.classList.add("active-nav");
+        
+        const text = link.innerText.trim();
+        const sectionId = navMap[text];
+        
+        if (sectionId) {
+            // Save to localStorage
+            saveCurrentSection(sectionId);
+            
+            // ✅ FORCE HIDE CALENDAR LOADING before switching
+            const calendarLoading = document.getElementById('calendar-loading');
+            const calendarGrid = document.getElementById('calendar-grid');
+            if (calendarLoading) calendarLoading.classList.add('hidden');
+            if (calendarGrid) calendarGrid.classList.add('hidden');
+            
+            // Show new section
+            document.getElementById(sectionId).classList.remove("hidden");
+            
+            // ✅ ONLY load calendar if navigating TO schedule
+            if (sectionId === 'section-schedule') {
+                console.log('📅 Navigating to schedule, loading calendar');
+                loadCalendar();
+            } else if (sectionId === 'section-book') {
+                resetBookingForm();
+            } else if (sectionId === 'section-mybookings') {
+                loadMyBookings();
+            } else if (sectionId === 'section-settings') {
+                loadBookingStats();
+                loadProfileSettings();
+            }
+        }
+        
+        document.getElementById("section-dashboard").classList.add("hidden");
+        if (window.innerWidth < 1024) toggleSidebar();
+    });
+});
 
 
             // Initialize
@@ -11682,11 +11773,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 setupDateInput();
             }
 
- function loadCalendar() {
-    // Show loading screen
+// ✅ FIXED: Calendar only loads when section is visible
+let calendarLoadingAbort = null; // Track loading state
+
+function loadCalendar() {
+    console.log('📅 loadCalendar() called');
+    
+    const scheduleSection = document.getElementById('section-schedule');
     const calendarGrid = document.getElementById('calendar-grid');
     const calendarLoading = document.getElementById('calendar-loading');
     
+    // ✅ CRITICAL CHECK: Only proceed if schedule section is VISIBLE
+    if (!scheduleSection || scheduleSection.classList.contains('hidden')) {
+        console.log('❌ Calendar not visible, aborting load');
+        
+        // Force hide loading if it's showing
+        if (calendarLoading) calendarLoading.classList.add('hidden');
+        if (calendarGrid) calendarGrid.classList.add('hidden');
+        
+        return; // EXIT IMMEDIATELY
+    }
+    
+    console.log('✅ Schedule section is visible, proceeding with load');
+    
+    // Abort any previous loading
+    if (calendarLoadingAbort) {
+        calendarLoadingAbort = true;
+    }
+    calendarLoadingAbort = false;
+    
+    // Show loading screen
     if (calendarGrid) calendarGrid.classList.add('hidden');
     if (calendarLoading) calendarLoading.classList.remove('hidden');
     
@@ -11702,19 +11818,46 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(data => {
             calendarData = data;
             
-            // Simulate minimum loading time for smooth UX (500ms)
+            // Minimum loading time for smooth UX
             setTimeout(() => {
+                // ✅ DOUBLE CHECK: User still on schedule section?
+                const scheduleSection = document.getElementById('section-schedule');
+                
+                if (calendarLoadingAbort || !scheduleSection || scheduleSection.classList.contains('hidden')) {
+                    console.log('⚠️ User left schedule, cancelling display');
+                    
+                    // FORCE HIDE EVERYTHING
+                    if (calendarLoading) calendarLoading.classList.add('hidden');
+                    if (calendarGrid) calendarGrid.classList.add('hidden');
+                    
+                    return; // EXIT
+                }
+                
+                console.log('✅ Still on schedule, showing calendar');
+                
+                // Generate and show calendar
                 generateCalendar();
                 
-                // Hide loading, show calendar
                 if (calendarLoading) calendarLoading.classList.add('hidden');
                 if (calendarGrid) calendarGrid.classList.remove('hidden');
+                
             }, 500);
         })
         .catch(error => {
-            console.error('Error loading calendar:', error);
+            console.error('❌ Calendar load error:', error);
             
-            // Hide loading on error
+            // ✅ CHECK: User still on schedule section?
+            const scheduleSection = document.getElementById('section-schedule');
+            
+            if (calendarLoadingAbort || !scheduleSection || scheduleSection.classList.contains('hidden')) {
+                console.log('⚠️ User left, hiding error message');
+                
+                // FORCE HIDE
+                if (calendarLoading) calendarLoading.classList.add('hidden');
+                return;
+            }
+            
+            // Show error only if still on schedule
             if (calendarLoading) {
                 calendarLoading.innerHTML = `
                     <div class="text-center py-8">
