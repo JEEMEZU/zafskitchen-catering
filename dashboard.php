@@ -5827,25 +5827,25 @@ if ($currentTimestamp > $eventEndTimestamp) {
                                             class="form-input w-full border-2 border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#DC2626] focus:border-[#DC2626] text-black" required>
                                             <option value="">Select a package</option>
 
-                                                <optgroup label="Ã°Å¸Å½â€š Birthday/Event Packages">
+                                                <optgroup label="Birthday/Event Packages">
                                                     <option value="silver" data-price="767">Silver Package -  ₱767/person ( ₱23K-50K)</option>
                                                     <option value="gold" data-price="1367">Gold Package -  ₱1,367/person ( ₱41K-69K)</option>
                                                     <option value="platinum" data-price="1600">Platinum Package -  ₱1,600/person ( ₱48K-82K)</option>
                                                     <option value="diamond" data-price="2233">Diamond Package -  ₱2,233/person ( ₱67K-97K)</option>
                                                 </optgroup>
 
-                                                <optgroup label="Ã°Å¸â€™Â Wedding Packages">
+                                                <optgroup label="Wedding Packages">
                                                     <option value="basic_wedding" data-price="1400">Basic Wedding -  ₱1,400/person ( ₱42K-75K)</option>
                                                     <option value="premium_wedding" data-price="2600">Premium Wedding -  ₱2,600/person ( ₱130K-165K)</option>
                                                 </optgroup>
 
-                                                <optgroup label="Ã°Å¸â€˜â€” Debut Packages">
+                                                <optgroup label="Debut Packages">
                                                     <option value="silver_debut" data-price="800">Silver Debut -  ₱800/person ( ₱24K-52K)</option>
                                                     <option value="gold_debut" data-price="1433">Gold Debut -  ₱1,433/person ( ₱43K-72K)</option>
                                                     <option value="platinum_debut" data-price="1800">Platinum Debut -  ₱1,800/person ( ₱54K-86K)</option>
                                                 </optgroup>
 
-                                                <optgroup label="Ã°Å¸ÂÂ¢ Corporate Packages">
+                                                <optgroup label="Corporate Packages">
                                                     <option value="silver_corporate" data-price="833">Silver Corporate -  ₱833/person ( ₱25K-50K)</option>
                                                     <option value="gold_corporate" data-price="1467">Gold Corporate -  ₱1,467/person ( ₱44K-69K)</option>
                                                     <option value="platinum_corporate" data-price="1667">Platinum Corporate -  ₱1,667/person ( ₱50K-80K)</option>
@@ -9538,7 +9538,7 @@ content.innerHTML = `
                 </div>
             </div>
             <div class="mt-3 pt-3 border-t border-green-200">
-                <p class="text-sm text-green-700 font-semibold">âœ“ PAYMENT RECEIVED & CONFIRMED</p>
+                <p class="text-sm text-green-700 font-semibold">PAYMENT RECEIVED & CONFIRMED</p>
             </div>
         </div>
         ` : ''}
