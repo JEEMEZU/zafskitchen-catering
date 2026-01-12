@@ -1,26 +1,4 @@
     <?php       
-    // Prevent caching - MUST BE FIRST
-    header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-    header("Cache-Control: post-check=0, pre-check=0", false);
-    header("Pragma: no-cache");
-    header("Expires: Thu, 01 Jan 1970 00:00:00 GMT");
-
-    session_start();
-    require_once 'connection.php';
-
-    // âœ… CHECK IF USER IS LOGGED IN - REDIRECT IF NOT
-    if (!isset($_SESSION['user_id']) || !isset($_SESSION['email'])) {
-        // Log the unauthorized access attempt
-        error_log("Unauthorized dashboard access - No session found");
-        
-        // Clear any cached data
-        session_destroy();
-        
-        // Force redirect to auth page
-        header("Location: auth.php?error=session_expired");
-        exit();
-    }
-
     // âœ… PREVENT ACCESS IF JUST LOGGED OUT
     if (isset($_COOKIE['just_logged_out'])) {
         error_log("Dashboard access blocked - User just logged out");
