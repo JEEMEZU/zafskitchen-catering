@@ -1,29 +1,34 @@
-    <?php     
-    
-    // Ã¢Å“â€¦ CHECK IF USER IS LOGGED IN
-    if (!isset($_SESSION['user_id']) || !isset($_SESSION['email'])) {
-        // Clear any cached data
-        session_destroy();
-        header("Location: auth.php");
-        exit();
-    } 
-    
-    // âœ… PREVENT ACCESS IF JUST LOGGED OUT
-    if (isset($_COOKIE['just_logged_out'])) {
-        error_log("Dashboard access blocked - User just logged out");
-        
-        // Clear the logout cookie
-        setcookie('just_logged_out', '', time() - 3600, '/');
-        
-        // Destroy session
-        session_destroy();
-        
-        // Force redirect
-        header("Location: auth.php?logout=complete");
-        exit();
-    }
+<?php
+session_start();
 
-    require_once 'connection.php';
+// ✅ CHECK IF USER IS LOGGED IN
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['email'])) {
+    // Only destroy if session exists
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_unset();
+        session_destroy();
+    }
+    header("Location: auth.php");
+    exit();
+} 
+
+// ✅ PREVENT ACCESS IF JUST LOGGED OUT
+if (isset($_COOKIE['just_logged_out'])) {
+    error_log("Dashboard access blocked - User just logged out");
+    
+    // Clear the logout cookie
+    setcookie('just_logged_out', '', time() - 3600, '/');
+    
+    // Destroy session
+    session_unset();
+    session_destroy();
+    
+    // Force redirect
+    header("Location: auth.php?logout=complete");
+    exit();
+}
+
+require_once 'connection.php';
 
     // ✅ SUBMIT RATING AND FEEDBACK - FIXED POSITION
     if ($_POST && isset($_POST['action']) && $_POST['action'] === 'submit_rating') {
