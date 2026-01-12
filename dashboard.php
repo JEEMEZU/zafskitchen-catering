@@ -16,6 +16,11 @@
 
     require_once 'connection.php';
 
+
+
+
+
+
     // Ã¢Å“â€¦ CHECK IF USER IS LOGGED IN
     if (!isset($_SESSION['user_id']) || !isset($_SESSION['email'])) {
         // Clear any cached data
