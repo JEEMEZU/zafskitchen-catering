@@ -1,4 +1,13 @@
-    <?php       
+    <?php     
+    
+    // Ã¢Å“â€¦ CHECK IF USER IS LOGGED IN
+    if (!isset($_SESSION['user_id']) || !isset($_SESSION['email'])) {
+        // Clear any cached data
+        session_destroy();
+        header("Location: auth.php");
+        exit();
+    } 
+    
     // âœ… PREVENT ACCESS IF JUST LOGGED OUT
     if (isset($_COOKIE['just_logged_out'])) {
         error_log("Dashboard access blocked - User just logged out");
@@ -15,19 +24,6 @@
     }
 
     require_once 'connection.php';
-
-
-
-
-
-
-    // Ã¢Å“â€¦ CHECK IF USER IS LOGGED IN
-    if (!isset($_SESSION['user_id']) || !isset($_SESSION['email'])) {
-        // Clear any cached data
-        session_destroy();
-        header("Location: auth.php");
-        exit();
-    }
 
     // ✅ SUBMIT RATING AND FEEDBACK - FIXED POSITION
     if ($_POST && isset($_POST['action']) && $_POST['action'] === 'submit_rating') {
